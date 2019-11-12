@@ -1,0 +1,26 @@
+[Unit]
+# https://www.freedesktop.org/software/systemd/man/systemd.unit.html
+Description=uberwald
+# StartLimitIntervalSec in recent systemd versions
+StartLimitInterval=0
+
+[Service]
+# https://www.freedesktop.org/software/systemd/man/systemd.service.html
+Type=simple
+User=intevation
+Group=intevation
+WorkingDirectory=/home/intevation/urwaldpate
+ExecStart=/home/intevation/urwaldpate/uberwald
+Restart=always
+RestartSec=5s
+
+PermissionsStartOnly=true
+ExecStartPre=/bin/mkdir -p /var/log/uberwald
+ExecStartPre=/bin/chown root:adm /var/log/uberwald
+ExecStartPre=/bin/chmod 755 /var/log/uberwald
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=uberwald
+
+[Install]
+WantedBy=multi-user.target
