@@ -23,8 +23,10 @@ var databaseURL string
 var featuresURL string
 
 func init() {
+	var envFile string
+	envFile = ".uberwald.env"
 
-	err := godotenv.Load()
+	err := godotenv.Load(envFile)
 
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -115,16 +117,17 @@ func main() {
 	if appAddr != "" {
 		// Run as a local web server
 		fs := http.FileServer(http.Dir("static"))
-		mux.Handle("/", basicAuth(fs, username, password, realm))
-		mux.HandleFunc("/upload", BasicAuth(upload, username, password, realm))
-		mux.HandleFunc("/hektar", isAuthorized(hektar))
+		mux.Handle("/urwaldpate/update", http.StripPrefix("/urwaldpate/update", basicAuth(fs, username, password, realm)))
+		mux.HandleFunc("/urwaldpate/update/upload", BasicAuth(upload, username, password, realm))
+		mux.HandleFunc("/urwaldpate/hektar", isAuthorized(hektar))
 		err = http.ListenAndServe(appAddr, mux)
+
 	} else {
 		// Run as FCGI via standard I/O
 		fs := http.FileServer(http.Dir("static"))
-		mux.Handle("/fcgi-bin/wiederherstellen", basicAuth(fs, username, password, realm))
-		mux.HandleFunc("/fcgi-bin/upload", BasicAuth(upload, username, password, realm))
-		mux.HandleFunc("/fcgi-bin/hektar", isAuthorized(hektar))
+		mux.Handle("/fcgi-bin/uberwald/", http.StripPrefix("/fcgi-bin/uberwald", basicAuth(fs, username, password, realm)))
+		mux.HandleFunc("/fcgi-bin/uberwald/upload", BasicAuth(upload, username, password, realm))
+		mux.HandleFunc("/fcgi-bin/uberwald/hektar", isAuthorized(hektar))
 		err = fcgi.Serve(nil, mux)
 	}
 
