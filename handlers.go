@@ -54,6 +54,10 @@ type Feature struct {
 	CRS         map[string]interface{} `json:"crs,omitempty"` // Coordinate Reference System Objects are not currently supported
 }
 
+func sendJS(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "ui/js/geojsonhint.js")
+}
+
 func update(w http.ResponseWriter, r *http.Request) {
 
 	// Use the template.ParseFiles() function to read the template file into a

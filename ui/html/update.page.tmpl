@@ -22,9 +22,66 @@
       height: 90px;
       padding-top: 40px;
     }
+    #hinweise {
+      text-align: left;
+      padding: 1em;
+    }
+    #infos {
+      text-align: left;
+      padding: 1em;
+      background: gainsboro;
+      display: none;
+    }
+    #meldungen {
+      text-align: left;
+      padding: 1em;
+      background: lemonchiffon;
+      display: none;
+    }
   </style>
+  <script src="update/geojsonhint.js"></script>
+  <script>
+    function validateGeoJSON() {
+      const selectedFile = document.getElementById("input").files[0];
+      var infos = [];
+      infos.push(
+        "<li>",
+        "<em>",
+        escape(selectedFile.name),
+        "</em> (",
+        selectedFile.type || "n/a",
+        ") - ",
+        selectedFile.size,
+        " bytes, last modified: ",
+        selectedFile.lastModifiedDate
+          ? selectedFile.lastModifiedDate.toLocaleDateString()
+          : "n/a",
+        "</li>"
+      );
+      document.getElementById("infos").innerHTML =
+        "<strong>Infos zur Datei:</strong><br/><ul>" + infos.join("") + "</ul>";
+      document.getElementById("infos").style.display = "block";
+      var reader = new FileReader();
+
+      reader.onload = function(e) {
+        var text = reader.result;
+        var feedback = geojsonhint.hint(text);
+
+        var output = [];
+        for (var i = 0, f; (f = feedback[i]); i++) {
+          output.push("<li><em>", f.message, "</em>", "</li>");
+        }
+        document.getElementById("meldungen").innerHTML =
+          "<strong>Meldungen:</strong><br/><ul>" + output.join("") + "</ul>";
+        document.getElementById("meldungen").style.display = "block";
+        console.log(feedback);
+      };
+
+      reader.readAsText(selectedFile);
+    }
+  </script>
   <body>
-    <h1>Urwaldpate Biesenthaler Becken Daten aktualisieren.</h1>
+    <h1>Urwaldpate Biesenthaler Becken Daten aktualisieren</h1>
     <div class="container">
       <div id="wrapform">
         <form
@@ -32,10 +89,42 @@
           action="/urwaldpate/update/upload"
           method="post"
         >
-          <input type="file" name="myFile" />
+          <input
+            type="file"
+            accept=".json,.geojson"
+            name="myFile"
+            id="input"
+            onchange="validateGeoJSON();"
+          />
           <input type="submit" value="aktualisieren" />
         </form>
       </div>
+
+      <div id="hinweise">
+        <strong>Hinweise:</strong>
+        <ul>
+          <li>
+            Bitte vor dem Aktualisieren die Datei in
+            <a
+              href="http://geojson.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              >http://geojson.io</a
+            >
+            überprüfen.
+          </li>
+          <li>
+            Es wird nur eine Datei mit der Endung <em>.json</em> oder
+            <em>.geojson</em> angenommen.
+          </li>
+          <li>
+            Meldung <em>old-style crs member is not recommended</em> kann
+            ignoriert werden.
+          </li>
+        </ul>
+      </div>
+      <div id="infos"></div>
+      <div id="meldungen"></div>
     </div>
   </body>
 </html>
