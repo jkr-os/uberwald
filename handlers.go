@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"text/template"
 	"time"
 
 	"strconv"
@@ -51,6 +52,29 @@ type Feature struct {
 	Geometry    *Geometry              `json:"geometry,omitempty"`
 	Properties  *Properties            `json:"properties,omitempty"`
 	CRS         map[string]interface{} `json:"crs,omitempty"` // Coordinate Reference System Objects are not currently supported
+}
+
+func update(w http.ResponseWriter, r *http.Request) {
+
+	// Use the template.ParseFiles() function to read the template file into a
+	// template set. If there's an error, we log the detailed error message and use
+	// the http.Error() function to send a generic 500 Internal Server Error
+	// response to the user.
+	ts, err := template.ParseFiles("./ui/html/update.page.tmpl")
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
+
+	// We then use the Execute() method on the template set to write the template
+	// content as the response body. The last parameter to Execute() represents any
+	// dynamic data that we want to pass in, which for now we'll leave as nil.
+	err = ts.Execute(w, nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+	}
 }
 
 func upload(w http.ResponseWriter, r *http.Request) {
@@ -104,6 +128,21 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println(string(body))
+	ts, err := template.ParseFiles("./ui/html/received.page.tmpl")
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
+
+	// We then use the Execute() method on the template set to write the template
+	// content as the response body. The last parameter to Execute() represents any
+	// dynamic data that we want to pass in, which for now we'll leave as nil.
+	err = ts.Execute(w, nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+	}
 
 }
 

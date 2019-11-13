@@ -116,8 +116,7 @@ func main() {
 
 	if appAddr != "" {
 		// Run as a local web server
-		fs := http.FileServer(http.Dir("static"))
-		mux.Handle("/urwaldpate/update", http.StripPrefix("/urwaldpate/update", basicAuth(fs, username, password, realm)))
+		mux.HandleFunc("/urwaldpate/update", BasicAuth(update, username, password, realm))
 		mux.HandleFunc("/urwaldpate/update/upload", BasicAuth(upload, username, password, realm))
 		mux.HandleFunc("/urwaldpate/hektar", isAuthorized(hektar))
 		err = http.ListenAndServe(appAddr, mux)
