@@ -89,6 +89,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error Retrieving the File")
 		log.Println(err)
+		fmt.Fprintf(w, " Error Retrieving the File %v...", err)
 		return
 	}
 	defer file.Close()
@@ -100,6 +101,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	fileBytes, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Println(err)
+		fmt.Fprintf(w, " Error Reading the File %v...", err)
 	}
 
 	timeout := time.Duration(5 * time.Second)
@@ -110,24 +112,26 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	request.Header.Set("Content-type", "application/json")
 
 	if err != nil {
+		fmt.Fprintf(w, " Error putting the File %v...", err)
 		log.Fatalln(err)
 	}
 
 	resp, err := client.Do(request)
 
 	if err != nil {
+		fmt.Fprintf(w, " Error in response %v...", err)
 		log.Fatalln(err)
 	}
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	// body, err := ioutil.ReadAll(resp.Body)
 
-	if err != nil {
-		log.Fatalln(err)
-	}
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
 
-	log.Println(string(body))
+	// log.Println(string(body))
 	ts, err := template.ParseFiles("./ui/html/received.page.tmpl")
 	if err != nil {
 		log.Println(err.Error())
