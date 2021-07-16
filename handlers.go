@@ -91,6 +91,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	// it also returns the FileHeader so we can get the Filename,
 	// the Header and the size of the file
 	file, handler, err := r.FormFile("myFile")
+	projectname, err := r.FormValue("projectname")
 	if err != nil {
 		log.Println("Error Retrieving the File")
 		log.Println(err)
@@ -130,15 +131,11 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln("Error opening database:", err)
 	}
 
-	projectname := "project"
-
-	// TODO get a project name from form OR from features[0].properties.gebiet
-
 	child, err := ref.Child(projectname)
 	if err != nil {
-		ref.Update(ctx, map[string]interface{}{projectname, content }
+		ref.Update(ctx, map[string]interface{}{ projectname, fileBytes }
 	} else {
-		ref.Set(ctx, map[string]interface{}{projectname, content }
+		ref.Set(ctx, map[string]interface{}{ projectname, fileBytes }
 	}
 	ts, err := template.ParseFiles("./ui/html/received.page.tmpl")
 	if err != nil {
