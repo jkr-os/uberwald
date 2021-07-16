@@ -131,8 +131,8 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln("Error opening database:", err)
 	}
 
-	child, err := ref.Child(projectname)
-	if err != nil {
+	child := ref.Child(projectname)
+	if child != nil {
 		ref.Update(ctx, map[string]interface{}{ projectname, fileBytes }
 	} else {
 		ref.Set(ctx, map[string]interface{}{ projectname, fileBytes }
