@@ -1,15 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"log"
-	"html"
 	"net/http"
 	"strings"
 	"text/template"
-	"time"
 
 	"strconv"
 
@@ -91,7 +89,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	// it also returns the FileHeader so we can get the Filename,
 	// the Header and the size of the file
 	file, handler, err := r.FormFile("myFile")
-	projectname, err := r.FormValue("projectname")
+	projectname := r.FormValue("projectname")
 	if err != nil {
 		log.Println("Error Retrieving the File")
 		log.Println(err)
@@ -125,17 +123,17 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln("Error initializing database client:", err)
 	}
 
-	ref,err := client.NewRef("wildnispate")
+	ref := client.NewRef("wildnispate")
 
-	if err != nil {
+	if ref == nil {
 		log.Fatalln("Error opening database:", err)
 	}
 
 	child := ref.Child(projectname)
 	if child != nil {
-		ref.Update(ctx, map[string]interface{}{ projectname, fileBytes }
+		ref.Update(ctx, map[string]interface{}{projectname, fileBytes})
 	} else {
-		ref.Set(ctx, map[string]interface{}{ projectname, fileBytes }
+		ref.Set(ctx, map[string]interface{}{projectname, fileBytes})
 	}
 	ts, err := template.ParseFiles("./ui/html/received.page.tmpl")
 	if err != nil {
@@ -160,9 +158,9 @@ func hektar(w http.ResponseWriter, r *http.Request) {
 	//id, err := strconv.Atoi(r.URL.Query().Get("id"))
 
 	queryIDs := strings.Split(r.URL.Query().Get("id"), ",")
-	area, err := r.URL.Query().Get("area")
+	area := r.URL.Query().Get("area")
 	areaurl := "biesenthalerbecken/features"
-	if err == nil {
+	if area == "" {
 		areaurl = "wildnispate/" + html.UnescapeString(area) + "/features"
 	}
 
