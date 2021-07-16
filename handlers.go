@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"html"
 	"net/http"
 	"strings"
 	"text/template"
@@ -108,11 +109,64 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, " Error Reading the File %v...", err)
 	}
 
+	// TODO add a projectname
+	// get "features" from file
+	// validate?
+	// add to 'projectname' || take from first feature.properties.gebiet
+
+	//TODO
+	ctx := context.Background()
+	opt := option.WithCredentialsFile(credentialsFile)
+	config := &firebase.Config{DatabaseURL: databaseURL}
+	app, err := firebase.NewApp(ctx, config, opt)
+
+	if err != nil {
+		panic(fmt.Sprintf("error initializing app: %v", err))
+	}
+
+	client, err := app.Database(ctx)
+
+	if err != nil {
+		log.Fatalln("Error initializing database client:", err)
+	}
+
+	ref := client.NewRef("wildnispate")
+	// TODO check and/or create child
+	// if no child:
+  // if err := client.NewRef("accounts/alice").Set(ctx, acc); err != nil {
+  //log.Fatal(err) }
+	// else
+	if err := ref.Update(ctx, map[string]interface{}{projectname, content
+		}); err != nil {
+			// set content, as not there yet
+			// if still error, then:
+			log.Fatalln("Error updating child:", err)
+				}
+
+				fmt.Fprintf(w, "updated project...", projectname)
+
+				break
+
+			}
+		}
+
+	// if err := ref.Child(strconv.Itoa(index)).Update(ctx, map[string]interface{}{
+		// [area] : [content] //update or insert?
+		// 	upload: komplettneuupload- pack geojson in datenbank
+// json: {biesenthalerbecken: {features: []}
+// json: {wildnispate: { "Anklamer Stadtbruch": {features}, "Nonnenhof": {features: ""} } }
+// if err := ref.Child(strconv.Itoa(index)).Update(ctx, map[string]interface{}{ "properties/PatenID": 1,
+// 				}); err != nil {
+// 					log.Fatalln("Error updating child:", err)
+// 				} golang.org/x/net/html func UnescapeString(string) string
+//         118 ff. delete
+// 				api firebase.google.com/
+
 	timeout := time.Duration(5 * time.Second)
 
 	client := http.Client{Timeout: timeout}
 
-	request, err := http.NewRequest("PUT", featuresURL, bytes.NewBuffer(fileBytes))
+	request, err := http.NewRequest("PUT", featuresURL, bytes.NewBuffer(fileBytes)) // replace with PUT (see ~202)
 	request.Header.Set("Content-type", "application/json")
 
 	if err != nil {
