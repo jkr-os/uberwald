@@ -131,9 +131,9 @@ func upload(w http.ResponseWriter, r *http.Request) {
 
 	child := ref.Child(projectname)
 	if child != nil {
-		ref.Update(ctx, map[string]interface{}{projectname, fileBytes})
+		ref.Update(ctx, map[string]interface{}{projectname: fileBytes})
 	} else {
-		ref.Set(ctx, map[string]interface{}{projectname, fileBytes})
+		ref.Set(ctx, map[string]interface{}{projectname: fileBytes})
 	}
 	ts, err := template.ParseFiles("./ui/html/received.page.tmpl")
 	if err != nil {
