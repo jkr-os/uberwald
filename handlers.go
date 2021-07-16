@@ -159,6 +159,11 @@ func hektar(w http.ResponseWriter, r *http.Request) {
 	//id, err := strconv.Atoi(r.URL.Query().Get("id"))
 
 	queryIDs := strings.Split(r.URL.Query().Get("id"), ",")
+	area, err := r.URL.Query().Get("area")
+	areaurl := "biesenthalerbecken/features"
+	if err == nil {
+		areaurl = "wildnispate/" + html.UnescapeString(area) + "/features"
+	}
 
 	ctx := context.Background()
 	opt := option.WithCredentialsFile(credentialsFile)
@@ -175,7 +180,7 @@ func hektar(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln("Error initializing database client:", err)
 	}
 
-	ref := client.NewRef("biesenthalerbecken/features")
+	ref := client.NewRef(areaurl)
 	var features []Feature
 
 	if err := ref.Get(ctx, &features); err != nil {
